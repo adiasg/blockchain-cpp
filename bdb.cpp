@@ -1,6 +1,5 @@
 #include "bdb.h"
 #include "block.h"
-#include "crypto.h"
 #include "id.h"
 #include <string.h>
 #include <string>
