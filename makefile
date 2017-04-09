@@ -27,5 +27,11 @@ server.o : $(objects) server.cpp
 client.o : $(objects) client.cpp
 	g++ -c client.cpp
 
+test-mining.o : $(objects) test-mining.cpp
+	g++ -c test-mining.cpp
+
+test-mining.out : $(objects) test-mining.o
+	g++ -o test-mining.out $(objects) test-mining.o -lcrypto
+
 clean :
 	rm $(objects) server.o* client.o*

@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
     for(int i = 0; i<no_conn; i++) {
         printf("ip_addr[%d]: %s portno[%d]: %d\n", i, ip_addr[i], i, portno[i]);
     }
+
     set_host_id();
     RSA *rsa_pri;
-
     char pri_pem_ext[] = "-pri.pem";
     char *pri_key_file = (char*)malloc(16);
     memcpy(pri_key_file, &host_id, strlen(host_id));

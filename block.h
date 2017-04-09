@@ -4,8 +4,8 @@
 #include "hash.h"
 #include <openssl/rsa.h>
 
-typedef struct block {		//1456-bit
-	uint16_t difficulty;//block difficulty
+typedef struct block {		//1448-bit
+	uint8_t difficulty;//block difficulty
 	char src[8];		//identifier for source
 	uint64_t ts; 		//timestamp
 	uint32_t nonce;		//nonce

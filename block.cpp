@@ -80,15 +80,15 @@ void printblk(block blk) {  // prints details of the block
 
 void hashblk(uint8_t* bhash, block* blk) { // returns hash of nonce, pl and phash
 	uint8_t blkbitrep[164];
-    memcpy(blkbitrep, &(blk->nonce), 4);
-	memcpy(blkbitrep+4, blk->pl, 128);
-	memcpy(blkbitrep+128, blk->phash, 32);
-	sha256(bhash, blkbitrep, 160);
+    memcpy(blkbitrep, &(blk->nonce), sizeof(blk->nonce));
+	memcpy(blkbitrep+sizeof(blk->nonce), blk->pl, sizeof(blk->pl));
+	memcpy(blkbitrep+sizeof(blk->nonce)+sizeof(blk->pl), blk->phash, sizeof(blk->phash));
+	sha256(bhash, blkbitrep, sizeof(blkbitrep));
 }
 
 void genblk(block* newblk, block* prevblk, char* msg, uint8_t len, RSA *rsa_pri) { //generate new linked block
     //newblk = (block*)malloc(sizeof(block));
-	newblk->difficulty = 0x01;
+	newblk->difficulty = 0x03;
     newblk->nonce = 0x00;
 	hashblk(newblk->phash, prevblk);
 	newblk->ts = time(NULL);
@@ -105,7 +105,7 @@ void genblk(block* newblk, block* prevblk, char* msg, uint8_t len, RSA *rsa_pri)
 
 void genblk_hash(block* newblk, uint8_t* phash, char* msg, uint8_t len, RSA *rsa_pri) { //generate new linked block with previous hash as phash
     //newblk = (block*)malloc(sizeof(block));
-    newblk->difficulty = 0x01;
+    newblk->difficulty = 0x03;
     newblk->nonce = 0x00;
     memcpy(newblk->phash, phash, 32);
 	newblk->ts = time(NULL);
