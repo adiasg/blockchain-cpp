@@ -41,7 +41,7 @@ void printchain(uint8_t *tophash, DB *db) {
 
 }
 
-uint32_t sumOfDiff(uint8_t *tophash, DB *db) {
+uint32_t sumOfDiff(uint8_t *tophash, DB *db){// , FILE *fp1) {
     uint8_t tophash_temp[32];
     memcpy(tophash_temp, tophash, 32);
 
@@ -51,9 +51,7 @@ uint32_t sumOfDiff(uint8_t *tophash, DB *db) {
     uint8_t genesis_hash[32];
     memset(genesis_hash, 0x00, 32);
     block blk;
-
     uint32_t sumofdiff = 0x00;
-
     printf("tophash_temp: ");
     for(int i = 0; i<32; i++) {
         printf("%02x", (tophash_temp[i]));
