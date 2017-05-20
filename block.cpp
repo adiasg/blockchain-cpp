@@ -88,7 +88,7 @@ void hashblk(uint8_t* bhash, block* blk) { // returns hash of nonce, pl and phas
 
 void genblk(block* newblk, block* prevblk, char* msg, uint8_t len, RSA *rsa_pri) { //generate new linked block
     //newblk = (block*)malloc(sizeof(block));
-	newblk->difficulty = 0x03;
+	newblk->difficulty = 0x01;
     newblk->nonce = 0x00;
 	hashblk(newblk->phash, prevblk);
 	newblk->ts = time(NULL);
@@ -105,7 +105,7 @@ void genblk(block* newblk, block* prevblk, char* msg, uint8_t len, RSA *rsa_pri)
 
 void genblk_hash(block* newblk, uint8_t* phash, char* msg, uint8_t len, RSA *rsa_pri) { //generate new linked block with previous hash as phash
     //newblk = (block*)malloc(sizeof(block));
-    newblk->difficulty = 0x03;
+    newblk->difficulty = 0x01;
     newblk->nonce = 0x00;
     memcpy(newblk->phash, phash, 32);
 	newblk->ts = time(NULL);
