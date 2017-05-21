@@ -56,32 +56,45 @@ int main(int argc, char const *argv[]) {
 
         uint8_t tophash[32], tophash_rec[32], tophash_temp[32];
         block a;
-        FILE *fp;
+        FILE *fp,*fp1;
         uint8_t req_type;
-        uint32_t maxSumOfDiff = 0x00, sumdiff_temp = 0x00;
+        //uint32_t maxSumOfDiff = 0x00, sumdiff_temp = 0x00;
+        uint32_t maxSumOfDiff,sumdiff_temp;
+        fp1 = fopen("sumdiff.txt", "r");
+        //printf("2\n");
+        fscanf(fp1,"%04x",&maxSumOfDiff);
+        //printf("2.5\n");
+        sumdiff_temp=maxSumOfDiff;
+        printf("INITIAL:  %04x",sumdiff_temp);
+        //printf("3\n");
+        fclose(fp1);
+        //printf("4\n");
+        if(sumdiff_temp==0x0000)
+        {
+            printf("Generating genesis block\n");
+            genesisblk(&a);
+            printf("Generated genesis block\n");
+            printblk(a);
+            hashblk(tophash, &a);
+            fp = fopen("tophash.txt", "w");
+            for(int i = 0; i<32; i++) {
+                fprintf(fp, "%02x ", (tophash[i]));
+            }
+            printf("Written to tophash.txt\n");
+            fclose(fp);
+            printf("Adding block to local db\n");
+            key.data = tophash;
+            key.size = 32;
+            data.data = &a;
+            data.size = sizeof(block);
+            if(db->put(db, NULL, &key, &data, DB_NOOVERWRITE)!=0) {
+                printf("db->put() returns non-zero\n");
+            }
+            else {
+                printf("Added block to local db\n");
+            }
+        }
 
-        printf("Generating genesis block\n");
-        genesisblk(&a);
-        printf("Generated genesis block\n");
-        printblk(a);
-        hashblk(tophash, &a);
-        fp = fopen("tophash.txt", "w");
-        for(int i = 0; i<32; i++) {
-            fprintf(fp, "%02x ", (tophash[i]));
-        }
-        printf("Written to tophash.txt\n");
-        fclose(fp);
-        printf("Adding block to local db\n");
-        key.data = tophash;
-        key.size = 32;
-        data.data = &a;
-        data.size = sizeof(block);
-        if(db->put(db, NULL, &key, &data, DB_NOOVERWRITE)!=0) {
-            printf("db->put() returns non-zero\n");
-        }
-        else {
-            printf("Added block to local db\n");
-        }
 
 
         while(newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) {
@@ -138,6 +151,9 @@ int main(int argc, char const *argv[]) {
                     printf("sumdiff_temp: %04x\n", sumdiff_temp);
                     if(sumdiff_temp > maxSumOfDiff) {
                         maxSumOfDiff = sumdiff_temp;
+                        fp1 = fopen("sumdiff.txt", "w");
+                        fprintf(fp1,"%04x",maxSumOfDiff);
+                        fclose(fp1);
                         printf("maxSumOfDiff: %04x\n", maxSumOfDiff);
                         memcpy(tophash, tophash_temp, 32);
                         printf("tophash updated\n");
@@ -146,7 +162,32 @@ int main(int argc, char const *argv[]) {
                             printf("%02x", (tophash[i]));
                         }
                         printf("\n");
-
+                        if(sumdiff_temp%6==0)
+                        {
+                                DB *db1;
+                                int ret1;
+                                ret1 = db_create(&db1, NULL, 0);
+                                if(ret1!=0) {
+                                    printf("Error in db creation.\n");
+                                }
+                                ret1 = db1->open(db1,NULL,"checkpoint.db", NULL, DB_HASH, DB_CREATE, 0);
+                                if(ret1!=0) {
+                                    printf("Error in db opening.\n");
+                                }
+                                DBT key, data;
+                                memset(&key, 0, sizeof(key));
+                                memset(&data, 0, sizeof(data));
+                                data.data = tophash;
+                                data.size = 32;
+                                key.data = &sumdiff_temp;
+                                key.size = sizeof(int);
+                                if(db1->put(db1, NULL, &key, &data, DB_NOOVERWRITE)!=0) {
+                                    printf("db->put() returns non-zero\n");
+                                }
+                                else {
+                                    printf("Added checkpoint to local db\n");
+                                }
+                        }
                         fp = fopen("tophash.txt", "w");
                         for(int i = 0; i<32; i++) {
                             fprintf(fp, "%02x ", (tophash[i]));
